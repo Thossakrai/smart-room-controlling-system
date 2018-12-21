@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      content="width=device-width,initial-scale=1,minimal-ui"
+      name="viewport"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/vue-material@beta/dist/vue-material.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/vue-material@beta/dist/theme/default.css"
+    />
+
+    <style>
+      .content {
+        font-size: 20px;
+      }
+
+      .toolbar {
+        background: #ed8953
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app">
+      <md-toolbar class="md-primary">
+        <h3 class="md-title">Homeless Room Monitor</h3>
+      </md-toolbar>
+      <md-card md-with-hover>
+        <md-ripple>
+          <md-card-header>
+            <div class="md-title"><strong>Air Conditioner</strong></div>
+          </md-card-header>
+
+          <md-card-content>
+            <p class="content">Status: <strong>{{airStatus ? 'ON' : 'OFF'}}</strong></p>
+            <p class="content">Temperature: <strong>{{temp}} °C</strong></p>
+          </md-card-content>
+        </md-ripple>
+      </md-card>
+
+      <md-card md-with-hover>
+        <md-ripple>
+          <md-card-header>
+            <div class="md-title"><strong>Lights</strong></div>
+          </md-card-header>
+
+          <md-card-content>
+            <p class="content">Bedroom: <strong>{{bedroomStatus ? 'ON' : 'OFF'}}</strong></p>
+            <p class="content">Bathroom: <strong>{{bathroomStatus ? 'ON' : 'OFF'}}</strong></p>
+          </md-card-content>
+        </md-ripple>
+      </md-card>
+
+      <md-card md-with-hover>
+        <md-ripple>
+          <md-card-header>
+            <div class="md-title"><strong>Door</strong></div>
+          </md-card-header>
+
+          <md-card-content>
+            <p class="content">Door status: <strong>{{doorStatus ? 'LOCK' : 'UNLOCK'}}</strong></p>
+          </md-card-content>
+        </md-ripple>
+      </md-card>
+    </div>
+
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/vue-material@beta"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase.js"></script>
+    <script>
+      const config = {
+        apiKey: "AIzaSyAqawPyC4lSEZrVrBh-gn7ELOu1TuaduGM",
+        authDomain: "seniority-line-bot.firebaseapp.com",
+        databaseURL: "https://seniority-line-bot.firebaseio.com",
+        projectId: "seniority-line-bot",
+        storageBucket: "seniority-line-bot.appspot.com",
+        messagingSenderId: "787405091168"
+      };
+      firebase.initializeApp(config);
+      Vue.use(VueMaterial.default);
+
+      const db = firebase.database();
+      const roomId = "-LRL6C7nA1kNGp29Synf";
+      const roomRef = db.ref("rooms").child(roomId);
+
+      new Vue({
+        el: "#app",
+        data: {
+          airStatus: '',
+          bathroomStatus: '',
+          bedroomStatus: '',
+          doorStatus: '',
+          temp: null
+        },
+        created() {
+          roomRef.on('value', (snapshot) => {
+            const result = snapshot.val()
+            this.airStatus = result.airStatus;
+            this.bathroomStatus = result.bathroomLightStatus;
+            this.bedroomStatus = result.bedroomLightStatus;
+            this.doorStatus = result.doorStatus;
+            this.temp = result.temp;
+          })
+        }
+      });
+    </script>
+  </body>
+</html>
